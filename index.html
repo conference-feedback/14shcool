@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обратная связь</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        .question {
+            margin: 15px 0;
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            margin-top: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .chart-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Оцените конференцию</h2>
+        <form id="feedbackForm">
+            <div class="question">
+                <label>Понравилась ли вам конференция?</label><br>
+                <input type="radio" name="feedback" value="да"> Да<br>
+                <input type="radio" name="feedback" value="нет"> Нет<br>
+                <input type="radio" name="feedback" value="очень понравилась"> Очень понравилась!<br>
+            </div>
+            <div class="question">
+                <label>Ваши комментарии:</label><br>
+                <textarea name="comment" placeholder="Оставьте свое мнение..."></textarea>
+            </div>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+    
+    <div class="chart-container" id="results" style="display: none;">
+        <h2>Результаты</h2>
+        <canvas id="feedbackChart"></canvas>
+    </div>
+
+    <script>
+        let feedbackData = { "да": 0, "нет": 0, "очень понравилась": 0 };
+
+        document.getElementById("feedbackForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let formData = new FormData(event.target);
+            let choice = formData.get("feedback");
+            if (choice) feedbackData[choice]++;
+            
+            localStorage.setItem("feedbackData", JSON.stringify(feedbackData));
+            window.location.href = "thank_you.html";
+        });
+    </script>
+</body>
+</html>
+
+<!-- thank_you.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Спасибо!</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        .chart-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Спасибо за участие!</h2>
+    <div class="chart-container">
+        <canvas id="feedbackChart"></canvas>
+    </div>
+
+    <script>
+        let storedData = JSON.parse(localStorage.getItem("feedbackData")) || { "да": 0, "нет": 0, "очень понравилась": 0 };
+        
+        let ctx = document.getElementById("feedbackChart").getContext("2d");
+        new Chart(ctx, {
+            type: "pie",
+            data: {
+                labels: ["Да", "Нет", "Очень понравилась"],
+                datasets: [{
+                    data: [storedData["да"], storedData["нет"], storedData["очень понравилась"]],
+                    backgroundColor: ["#28a745", "#dc3545", "#007bff"]
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
